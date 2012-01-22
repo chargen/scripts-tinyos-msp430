@@ -36,7 +36,7 @@ source $(dirname $0)/main.subr
 source $(dirname $0)/tinyos-main.subr
 
 function tinyos_msp430::version() {
-    local relase=$tinyos_msp430_release
+    local release=$tinyos_msp430_release
     if [[ $release == current ]]; then
         echo tinyos-msp430
     else
