@@ -61,7 +61,11 @@ function is_osx() {
 }
 
 function is_osx_snow_leopard() {
-    [[ $(uname) =~ ^10.8 ]]
+    [[ is_osx && $(uname -r) =~ ^10.8 ]]
+}
+
+function is_osx_lion() {
+    [[ is_osx && $(uname -r) =~ ^11.2 ]]
 }
 
 function is_linux() {
