@@ -64,7 +64,7 @@ function prepare() {
     fi
 
     for p in $scriptsdir/$nesc-fix_*.patch; do
-        do_patch $builddir $p
+        do_patch $builddir $p -p1
     done
 
     return 0
