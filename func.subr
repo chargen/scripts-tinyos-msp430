@@ -70,6 +70,11 @@ function is_osx_lion() {
     [[ $(sw_vers -productVersion) =~ ^10.7 ]]
 }
 
+function is_osx_mountain_lion() {
+    is_osx || return 1
+    [[ $(sw_vers -productVersion) =~ ^10.8 ]]
+}
+
 function is_linux() {
     [[ $(uname) = Linux ]]
 }
