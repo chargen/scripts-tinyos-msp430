@@ -73,9 +73,9 @@ function prepare() {
 function build() {
     do_cd $builddir
     if is_osx_lion || is_osx_mountain_lion; then
-        echo "==== using MacPorts gcc46  ===="
-        echo "export CC=/opt/local/bin/gcc-mp-4.6"
-        export CC=/opt/local/bin/gcc-mp-4.6
+        echo "==== using MacPorts gcc47  ===="
+        echo "export CC=/opt/local/bin/gcc-mp-4.7"
+        export CC=/opt/local/bin/gcc-mp-4.7
     fi
     [[ $nesc_release == current ]] && do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
