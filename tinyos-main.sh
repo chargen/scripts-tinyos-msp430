@@ -59,6 +59,11 @@ function prepare() {
     for p in $scriptsdir/${tinyos_main}_*.patch; do
         do_patch $builddir $p -p1
     done
+    if is_osx; then
+        for p in $scriptsdir/${tinyos_main}-osx_*.patch; do
+            do_patch $builddir $p -p1
+        done
+    fi
     return 0
 }
 
