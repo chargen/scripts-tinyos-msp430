@@ -73,9 +73,16 @@ function prepare() {
 function build() {
     do_cd $builddir
     if is_osx_lion || is_osx_mountain_lion; then
-        echo "==== using MacPorts gcc47  ===="
-        echo "export CC=/opt/local/bin/gcc-mp-4.7"
-        export CC=/opt/local/bin/gcc-mp-4.7
+        if [[ -x port ]]; then
+            echo "==== using MacPorts gcc47 ===="
+            echo "export CC=gcc-mp-4.7"
+            export CC=gcc-mp-4.7
+        fi
+        if [[ -x brew ]]; then
+            echo "==== using Homebrew gcc47 ===="
+            echo "export CC=gcc-4.7"
+            export CC=gcc-4.7
+        fi
     fi
     [[ $nesc_release == current ]] && do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
