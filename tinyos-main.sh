@@ -55,6 +55,10 @@ function download() {
 
 function prepare() {
     tinyos_main::config
+    [[ -x aclocal ]] \
+        || die "autoconf is not installed"
+    [[ -x automake ]] \
+        || die "automake is not installed"
     copy $tinyos_src/$tinyos_main $builddir
     for p in $scriptsdir/${tinyos_main}_*.patch; do
         do_patch $builddir $p -p1
