@@ -63,6 +63,11 @@ function prepare() {
         copy $nesc.tar.gz $builddir
     fi
 
+    if is_osx; then
+        for p in $scriptsdir/${nesc}-osx_*.patch; do
+            do_patch $builddir $p -p1
+        done
+    fi
     for p in $scriptsdir/$nesc-fix_*.patch; do
         do_patch $builddir $p -p1
     done
