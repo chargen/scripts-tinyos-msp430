@@ -35,21 +35,13 @@
 source $(dirname $0)/main.subr
 source $(dirname $0)/tinyos-main.subr
 
-function tinyos_main::repo() {
-    local release=$tinyos_main_release
-    if [[ $release == current ]]; then
-        echo $tinyos_main_repo/trunk
-    else
-        local version=$(tinyos_main::version)
-        echo $tinyos_main_repo/tags/release_${version//[-.]/_}
-    fi
-}
-
 function download() {
     tinyos_main::config
     [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
     local dir=$tinyos_src/$tinyos_main
-    clone --sudo svn $(tinyos_main::repo) $dir
+    clone --sudo git $tinyos_main_repo $dir
+    do_cd $dir
+    sudo git reset --hard $(tinyos_main::git_tag)
     return 0
 }
 

@@ -43,7 +43,7 @@ nesc_repo=:pserver:anonymous@nescc.cvs.sourceforge.net:/cvsroot/nescc
 #nesc=nesc-current
 
 # tinyos main
-tinyos_main_repo=http://tinyos-main.googlecode.com/svn
+tinyos_main_repo=https://github.com/tinyos/tinyos-main
 tinyos_main_release=tinyos-2.1.2
 #tinyos_main_release=current
 

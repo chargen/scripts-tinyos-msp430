@@ -41,6 +41,15 @@ function tinyos_main::version() {
     fi
 }
 
+function tinyos_main::git_tag() {
+    local release=$tinyos_main_release
+    if [[ $release == current ]]; then
+        echo HEAD
+    else
+        echo release_${release//[-.]/_}
+    fi
+}
+
 function tinyos_main::config() {
     do_cd $buildtop
     tinyos_main=$(tinyos_main::version)
