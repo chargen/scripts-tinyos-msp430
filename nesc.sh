@@ -34,19 +34,9 @@
 
 source $(dirname $0 )/main.subr
 
-function nesc::config() {
-    do_cd $buildtop
-    if [[ $nesc_release == current ]]; then
-        nesc=nesc
-    else
-        nesc=$nesc_release
-    fi
-}
-
 function download() {
-    nesc::config
-    if [[ $nesc_release == current ]]; then
-        clone cvs $nesc_repo $nesc
+    if [[ $nesc == nesc-current ]]; then
+        clone cvs $nesc_repo $nesc nesc
     else
         local version=${nesc#nesc-}
         local url=$nesc_url/v$version/$nesc.tar.gz/download
@@ -56,8 +46,7 @@ function download() {
 }
 
 function prepare() {
-    nesc::config
-    if [[ $nesc_release == current ]]; then
+    if [[ $nesc == nesc-current ]]; then
         copy $nesc $builddir
     else
         copy $nesc.tar.gz $builddir
@@ -77,19 +66,20 @@ function prepare() {
 
 function build() {
     do_cd $builddir
-    if is_osx_lion || is_osx_mountain_lion; then
-        if [[ -x port ]]; then
+    export EDITOR=
+    if is_osx_lion || is_osx_mountain_lion || is_osx_maverics; then
+        if [[ $(which port) =~ port ]]; then
+            local cc=/opt/local/bin/gcc-mp-4.7
+            [[ -x $cc ]] \
+                || die "Please install gcc47 by port command"
             echo "==== using MacPorts gcc47 ===="
-            echo "export CC=gcc-mp-4.7"
-            export CC=gcc-mp-4.7
-        fi
-        if [[ -x brew ]]; then
-            echo "==== using Homebrew gcc47 ===="
-            echo "export CC=gcc-4.7"
-            export CC=gcc-4.7
+            echo "export CC=$cc"
+            export CC=$cc
+        else
+            die "Unfortunately LLVM gcc can't compile working nescc"
         fi
     fi
-    [[ $nesc_release == current ]] && do_cmd ./Bootstrap
+    [[ $nesc == nesc-current ]] && do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
     do_cmd make -j$(num_cpus) \

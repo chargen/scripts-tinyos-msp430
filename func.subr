@@ -75,6 +75,11 @@ function is_osx_mountain_lion() {
     [[ $(sw_vers -productVersion) =~ ^10.8 ]]
 }
 
+function is_osx_maverics() {
+    is_osx || return 1
+    [[ $(sw_vers -productVersion) =~ ^10.9 ]]
+}
+
 function is_linux() {
     [[ $(uname) = Linux ]]
 }
@@ -148,7 +153,7 @@ function clone() {
         case $cmd in
         git) line+=(git clone $repo $out "$@");;
         svn) line+=(svn checkout $repo $out);;
-        cvs) line+=(cvs -z3 -d $repo checkout -P $out);;
+        cvs) line+=(cvs -z3 -d $repo checkout -d $out -P "$@");;
         *)   die "unknown command $cmd";;
         esac
         [[ $sudo == yes ]] && line=(sudo "${line[@]}")
