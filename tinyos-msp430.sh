@@ -83,9 +83,10 @@ function install() {
     [[ -d $tinyos_stow ]] \
         || do_cmd sudo mkdir -p $tinyos_stow
     do_cd $tinyos_stow
-    do_cmd "sudo rm -f tinyos-msp430*"
+    do_cmd "sudo stow -D -t $tinyos_root *"
+    do_cmd "sudo rm -f $tinyos_msp430"
     do_cmd "sudo ln -s $tinyos_src/$tinyos_msp430 ."
-    do_cmd "sudo stow -R -t $tinyos_root *"
+    do_cmd "sudo stow -S -t $tinyos_root *"
 }
 
 function cleanup() {
