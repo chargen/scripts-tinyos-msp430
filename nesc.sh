@@ -69,10 +69,10 @@ function build() {
     export EDITOR=
     if is_osx_lion || is_osx_mountain_lion || is_osx_maverics; then
         if [[ $(which port) =~ port ]]; then
-            local cc=/opt/local/bin/gcc-mp-4.7
+            local cc=/opt/local/bin/gcc-mp-4.8
             [[ -x $cc ]] \
-                || die "Please install gcc47 by port command"
-            echo "==== using MacPorts gcc47 ===="
+                || die "Please install gcc48 by port command"
+            echo "==== using MacPorts gcc48 ===="
             echo "export CC=$cc"
             export CC=$cc
         else
