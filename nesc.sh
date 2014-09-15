@@ -36,10 +36,10 @@ source $(dirname $0 )/main.subr
 
 function download() {
     if [[ $nesc == nesc-current ]]; then
-        clone cvs $nesc_repo $nesc nesc
+        clone git $nesc_repo $nesc
     else
         local version=${nesc#nesc-}
-        local url=$nesc_url/v$version/$nesc.tar.gz/download
+        local url=$nesc_url/v$version.tar.gz
         fetch $url $nesc.tar.gz
     fi
     return 0
@@ -66,20 +66,7 @@ function prepare() {
 
 function build() {
     do_cd $builddir
-    export EDITOR=
-    if is_osx_lion || is_osx_mountain_lion || is_osx_maverics; then
-        if [[ $(which port) =~ port ]]; then
-            local cc=/opt/local/bin/gcc-mp-4.8
-            [[ -x $cc ]] \
-                || die "Please install gcc48 by port command"
-            echo "==== using MacPorts gcc48 ===="
-            echo "export CC=$cc"
-            export CC=$cc
-        else
-            die "Unfortunately LLVM gcc can't compile working nescc"
-        fi
-    fi
-    [[ $nesc == nesc-current ]] && do_cmd ./Bootstrap
+    do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
     do_cmd make -j$(num_cpus) \

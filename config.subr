@@ -37,9 +37,9 @@ prefix=/opt/tinyos
 buildtarget=tinyos-msp430
 
 # nesc
-nesc_url=http://sourceforge.net/projects/nescc/files/nescc
-nesc=nesc-1.3.5
-nesc_repo=:pserver:anonymous@nescc.cvs.sourceforge.net:/cvsroot/nescc
+nesc_url=https://github.com/tinyos/nesc/archive
+nesc=nesc-1.3.6
+nesc_repo=https://github.com/tinyos/nesc.git
 #nesc=nesc-current
 
 # tinyos main
