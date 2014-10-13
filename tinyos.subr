@@ -32,6 +32,15 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+function tinyos_msp430::version() {
+    local release=$tinyos_msp430_release
+    if [[ $release == current ]]; then
+        echo tinyos-msp430
+    else
+        echo $release
+    fi
+}
+
 function tinyos_main::version() {
     local release=$tinyos_main_release
     if [[ $release == current ]]; then
@@ -50,13 +59,26 @@ function tinyos_main::git_tag() {
     fi
 }
 
-function tinyos_main::config() {
+function tinyos::config() {
     do_cd $buildtop
+    tinyos_msp430=$(tinyos_msp430::version)
     tinyos_main=$(tinyos_main::version)
     tinyos_root=$prefix/root
     tinyos_src=$prefix/sources
     tinyos_stow=$tinyos_src/stow
 }
+
+function tinyos::stow() {
+    [[ -d $tinyos_root ]] \
+        || do_cmd sudo mkdir -p $tinyos_root
+    [[ -d $tinyos_stow ]] \
+        || do_cmd sudo mkdir -p $tinyos_stow
+    do_cd $tinyos_stow
+    do_cmd "sudo stow -D -t $tinyos_root *"
+    do_cmd "sudo stow --override='.*\.nc' -S -t $tinyos_root $tinyos_main $tinyos_msp430"
+    do_cd $tinyos_stow
+}
+
 
 # Local Variables:
 # indent-tabs-mode: nil

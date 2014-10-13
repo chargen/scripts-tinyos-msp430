@@ -33,10 +33,10 @@
 #
 
 source $(dirname $0)/main.subr
-source $(dirname $0)/tinyos-main.subr
+source $(dirname $0)/tinyos.subr
 
 function download() {
-    tinyos_main::config
+    tinyos::config
     [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
     local dir=$tinyos_src/$tinyos_main
     clone --sudo git $tinyos_main_repo $dir
@@ -46,7 +46,7 @@ function download() {
 }
 
 function prepare() {
-    tinyos_main::config
+    tinyos::config
     [[ $(which autoheader) =~ autoheader ]] \
         || die "autoconf is not installed"
     [[ $(which automake) =~ automake ]] \
@@ -64,7 +64,7 @@ function prepare() {
 }
 
 function build() {
-    tinyos_main::config
+    tinyos::config
     do_cd $builddir/tools
     do_cmd ./Bootstrap \
         || die "bootstrap failed"
@@ -75,23 +75,16 @@ function build() {
 }
 
 function install() { 
-    tinyos_main::config
+    tinyos::config
     do_cd $builddir/tools
     do_cmd sudo make -j$(num_cpus) install
-
-    [[ -d $tinyos_root ]] \
-        || do_cmd sudo mkdir -p $tinyos_root
-    [[ -d $tinyos_stow ]] \
-        || do_cmd sudo mkdir -p $tinyos_stow
-    do_cd $tinyos_stow
-    do_cmd "sudo stow -D -t $tinyos_root *"
     do_cmd "sudo rm -f $tinyos_main"
     do_cmd "sudo ln -s $tinyos_src/$tinyos_main ."
-    do_cmd "sudo stow -S -t $tinyos_root *"
+    tinyos::stow
 }
 
 function cleanup() {
-    tinyos_main::config
+    tinyos::config
     do_cmd rm -rf $builddir
 }
 
