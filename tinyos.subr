@@ -69,11 +69,14 @@ function tinyos::config() {
 }
 
 function tinyos::stow() {
+    local src=$1
     [[ -d $tinyos_root ]] \
         || do_cmd sudo mkdir -p $tinyos_root
     [[ -d $tinyos_stow ]] \
         || do_cmd sudo mkdir -p $tinyos_stow
     do_cd $tinyos_stow
+    do_cmd "sudo rm -f $(basename $src)"
+    do_cmd "sudo ln -s $src ."
     do_cmd "sudo stow -D -t $tinyos_root *"
     do_cmd "sudo stow --override='.*\.nc' -S -t $tinyos_root $tinyos_main $tinyos_msp430"
     do_cd $tinyos_stow

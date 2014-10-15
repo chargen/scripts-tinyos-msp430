@@ -78,9 +78,7 @@ function install() {
     tinyos::config
     do_cd $builddir/tools
     do_cmd sudo make -j$(num_cpus) install
-    do_cmd "sudo rm -f $tinyos_main"
-    do_cmd "sudo ln -s $tinyos_src/$tinyos_main ."
-    tinyos::stow
+    tinyos::stow "$tinyos_src/$tinyos_main"
 }
 
 function cleanup() {

@@ -63,9 +63,7 @@ function install() {
         [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
         copy --sudo $tinyos_msp430.tar.gz $tinyos_src/$tinyos_msp430
     fi
-    do_cmd "sudo rm -f $tinyos_msp430"
-    do_cmd "sudo ln -s $tinyos_src/$tinyos_msp430 ."
-    tinyos::stow
+    tinyos::stow "$tinyos_src/$tinyos_msp430"
 }
 
 function cleanup() {
