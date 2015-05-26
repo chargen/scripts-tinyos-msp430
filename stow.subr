@@ -1,7 +1,7 @@
 #!/bin/bash
 # -*- mode: shell-script; mode: flyspell-prog; -*-
 #
-# Copyright (c) 2010, Tadashi G Takaoka
+# Copyright (c) 2015, Tadashi G Takaoka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,56 +32,31 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-function tinyos_msp430::version() {
-    local release=$tinyos_msp430_release
-    if [[ $release == current ]]; then
-        echo tinyos-msp430
-    else
-        echo $release
+function tinyos_stow() {
+    local sudo=no
+    [[ $1 == "--sudo" ]] && { sudo=yes; shift; }
+    [[ $# -ge 3 ]] || die "usage: stow [--sudo] root_dir stow_dir src_dir..."
+    local root_dir=$1; shift
+    local stow_dir=$1; shift
+    local rm=(rm) ln=(ln) mkdir=(mkdir) stow=(Stow)
+    if [[ $sudo == yes ]]; then
+        rm=(sudo rm)
+        ln=(sudo ln)
+        mkdir=(sudo mkdir)
+        stow=(sudo stow)
     fi
+    [[ -d $root_dir ]] || do_cmd "${mkdir[@]}" -p $root_dir
+    [[ -d $stow_dir ]] || do_cmd "${mkdir[@]}" -p $stow_dir
+    do_cd $stow_dir
+    do_cmd "${stow[@]}" -D -t $root_dir *
+    do_cmd "${rm[@]}" *
+    local src_dir
+    for src_dir in "$@"; do
+        do_cmd "${rm[@]}" -f $(basename $src_dir)
+        do_cmd "${ln[@]}" -s $src_dir .
+    done
+    do_cmd "${stow[@]}" --override="'.*\.nc|.*\.h'" -S -t $root_dir *
 }
-
-function tinyos_main::version() {
-    local release=$tinyos_main_release
-    if [[ $release == current ]]; then
-        echo tinyos-2.x
-    else
-        echo $release
-    fi
-}
-
-function tinyos_main::git_tag() {
-    local release=$tinyos_main_release
-    if [[ $release == current ]]; then
-        echo HEAD
-    else
-        echo release_${release//[-.]/_}
-    fi
-}
-
-function tinyos::config() {
-    do_cd $buildtop
-    tinyos_msp430=$(tinyos_msp430::version)
-    tinyos_main=$(tinyos_main::version)
-    tinyos_root=$prefix/root
-    tinyos_src=$prefix/sources
-    tinyos_stow=$tinyos_src/stow
-}
-
-function tinyos::stow() {
-    local src=$1
-    [[ -d $tinyos_root ]] \
-        || do_cmd sudo mkdir -p $tinyos_root
-    [[ -d $tinyos_stow ]] \
-        || do_cmd sudo mkdir -p $tinyos_stow
-    do_cd $tinyos_stow
-    do_cmd "sudo rm -f $(basename $src)"
-    do_cmd "sudo ln -s $src ."
-    do_cmd "sudo stow -D -t $tinyos_root *"
-    do_cmd "sudo stow --override='.*\.nc|.*\.h' -S -t $tinyos_root $tinyos_main $tinyos_msp430"
-    do_cd $tinyos_stow
-}
-
 
 # Local Variables:
 # indent-tabs-mode: nil

@@ -33,15 +33,15 @@
 #
 
 source $(dirname $0)/main.subr
-source $(dirname $0)/tinyos.subr
 
 function download() {
-    tinyos::config
-
-    if [[ $tinyos_msp430_release == current ]]; then
-        clone --sudo git $tinyos_msp430_repo $tinyos_src/$tinyos_msp430
+    local tinyos_src=$prefix/sources
+    [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
+    local dir=$tinyos_src/tinyos-msp430-$tinyos_msp430
+    if [[ $tinyos_msp430 == current ]]; then
+        clone --sudo git $tinyos_msp430_repo $dir
     else
-        fetch $tinyos_msp430_url/$tinyos_msp430.tar.gz
+        fetch $tinyos_msp430_url/tinyos-msp430-$tinyos_msp430.tar.gz
     fi
     return 0
 }
@@ -55,15 +55,14 @@ function build() {
 }
 
 function install() {
-    tinyos::config
-
-    if [[ $tinyos_msp430_release == current ]]; then
+    local tinyos_src=$prefix/sources
+    if [[ $tinyos_msp430 == current ]]; then
         :
     else
-        [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
-        copy --sudo $tinyos_msp430.tar.gz $tinyos_src/$tinyos_msp430
+        copy --sudo tinyos-msp430-$tinyos_msp430.tar.gz $tinyos_src/tinyos-msp430-$tinyos_msp430
     fi
-    tinyos::stow "$tinyos_src/$tinyos_msp430"
+    local srcs=($tinyos_src/tinyos-$tinyos_main $tinyos_src/tinyos-msp430-$tinyos_msp430)
+    do_cmd tinyos_stow --sudo $prefix/root $tinyos_src/stow "${srcs[@]}"
 }
 
 function cleanup() {

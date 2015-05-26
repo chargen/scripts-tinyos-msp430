@@ -35,29 +35,28 @@
 source $(dirname $0 )/main.subr
 
 function download() {
-    if [[ $nesc == nesc-current ]]; then
-        clone git $nesc_repo $nesc
+    if [[ $nesc == nesc ]]; then
+        clone git $nesc_repo nesc-$nesc
     else
-        local version=${nesc#nesc-}
-        local url=$nesc_url/v$version.tar.gz
-        fetch $url $nesc.tar.gz
+        local url=$nesc_url/v$nesc.tar.gz
+        fetch $url nesc-$nesc.tar.gz
     fi
     return 0
 }
 
 function prepare() {
-    if [[ $nesc == nesc-current ]]; then
-        copy $nesc $builddir
+    if [[ $nesc == current ]]; then
+        copy nesc-$nesc $builddir
     else
-        copy $nesc.tar.gz $builddir
+        copy nesc-$nesc.tar.gz $builddir
     fi
 
     if is_osx; then
-        for p in $scriptsdir/${nesc}-osx_*.patch; do
+        for p in $scriptsdir/nesc-$nesc-osx_*.patch; do
             do_patch $builddir $p -p1
         done
     fi
-    for p in $scriptsdir/$nesc-fix_*.patch; do
+    for p in $scriptsdir/nesc-$nesc-fix_*.patch; do
         do_patch $builddir $p -p1
     done
 
@@ -69,13 +68,13 @@ function build() {
     do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
-    do_cmd make -j$(num_cpus) \
+    do_cmd make \
         || die "make filed"
 }
 
 function install() {
     do_cd $builddir
-    do_cmd sudo make -j$(num_cpus) install
+    do_cmd sudo make install
 }
 
 function cleanup() { 

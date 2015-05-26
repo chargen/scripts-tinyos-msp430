@@ -1,7 +1,7 @@
-diff -ur tinyos-2.x/tools/configure.ac{.~1~,}
---- tinyos-2.x/tools/configure.ac.~1~	2013-05-01 18:26:41.000000000 +0900
-+++ tinyos-2.x/tools/configure.ac	2014-03-01 13:19:31.000000000 +0900
-@@ -101,7 +101,7 @@
+diff -ur tinyos-current/tools/configure.ac build-tinyos-main/tools/configure.ac
+--- tinyos-current/tools/configure.ac	2015-05-26 15:42:57.000000000 +0900
++++ build-tinyos-msp430-tinyos-main/tools/configure.ac	2015-05-26 15:43:00.000000000 +0900
+@@ -107,7 +107,7 @@
  if test $? -ne 0; then
    AC_ERROR(java not found)
  fi
@@ -9,11 +9,11 @@ diff -ur tinyos-2.x/tools/configure.ac{.~1~,}
 +JDK=`/bin/sh tinyos/misc/tos-locate-jre --jni`
  AC_MSG_RESULT($JDK)
  
- function jnimap {
-diff -ur tinyos-2.x/tools/tinyos/misc/tos-locate-jre{.~1~,}
---- tinyos-2.x/tools/tinyos/misc/tos-locate-jre{.~1~,}	2013-05-01 18:26:40.000000000 +0900
-+++ tinyos-2.x/tools/tinyos/misc/tos-locate-jre	2014-03-01 13:27:27.000000000 +0900
-@@ -67,11 +67,16 @@
+ AC_MSG_CHECKING(for location to put JARs)
+diff -ur tinyos-current/tools/tinyos/misc/tos-locate-jre build-tinyos-main/tools/tinyos/misc/tos-locate-jre
+--- tinyos-current/tools/tinyos/misc/tos-locate-jre	2015-05-26 15:42:57.000000000 +0900
++++ build-tinyos-main/tools/tinyos/misc/tos-locate-jre	2015-05-26 15:52:42.000000000 +0900
+@@ -72,11 +72,16 @@
  
      pn=`sw_vers -productName | sed 's/ //g'`
      pv=`sw_vers -productVersion | awk -F. '{ print $1 "." $2 }'`
@@ -21,7 +21,7 @@ diff -ur tinyos-2.x/tools/tinyos/misc/tos-locate-jre{.~1~,}
      ## Since we only want to modify this one script for now, stick the
      ## extra subdir at the end, beceuase that's what the reset of scripts
      ## presume. This is a work-around and should be eliminated eventually.
-     xcode_jdk=/Developer/SDKs/${pn}${pv}.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
+     xcode_jdk=/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers
      jhome=/Library/Java/Home
 +    else
 +    jhome=/System/Library/Frameworks/JavaVM.framework/Versions/Current
@@ -30,13 +30,13 @@ diff -ur tinyos-2.x/tools/tinyos/misc/tos-locate-jre{.~1~,}
      ;;
  
      Linux)
-@@ -134,7 +139,11 @@
+@@ -139,7 +144,11 @@
      # Windows, and IBM Java: in jre/bin
      # Sun Java on Linux: in jre/lib/i386
-     if [ `uname` = "Darwin" ]; then 
-+	if [[ $pv = 10.6 ]]; then # Snow Leopard
+     if [ `uname` = "Darwin" ]; then
++	if [[ $pv = 10.6 ]]; then #Snow Leopard
  	jnilocate "/Library/Java/Extensions"
-+	else
++        else
 +	jnilocate $jhome
 +	fi
      elif "$jhome/bin/java" -version 2>&1 | grep -q IBM || cygpath -w / >/dev/null 2>/dev/null; then

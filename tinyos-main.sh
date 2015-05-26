@@ -33,30 +33,38 @@
 #
 
 source $(dirname $0)/main.subr
-source $(dirname $0)/tinyos.subr
 
 function download() {
-    tinyos::config
+    local tinyos_src=$prefix/sources
     [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
-    local dir=$tinyos_src/$tinyos_main
-    clone --sudo git $tinyos_main_repo $dir
-    do_cd $dir
-    sudo git reset --hard $(tinyos_main::git_tag)
+    if [[ $tinyos_main == current ]]; then
+        local dir=$tinyos_src/tinyos-$tinyos_main
+        clone --sudo git $tinyos_main_repo $dir
+        do_cd $dir
+    else
+        local tag=release_tinyos_${tinyos_main//./_}
+        local url=$tinyos_main_url/$tag.tar.gz
+        fetch $url tinyos-${tinyos_main}.tar.gz
+    fi
     return 0
 }
 
 function prepare() {
-    tinyos::config
     [[ $(which autoheader) =~ autoheader ]] \
         || die "autoconf is not installed"
     [[ $(which automake) =~ automake ]] \
         || die "automake is not installed"
-    copy $tinyos_src/$tinyos_main $builddir
-    for p in $scriptsdir/${tinyos_main}_*.patch; do
+    if [[ $tinyos_main == current ]]; then
+        copy $prefix/sources/tinyos-$tinyos_main $builddir
+    else
+        local tag=release_tinyos_${timyos_main//./_}
+        copy tinyos-$tinyos_main.tar.gz $builddir
+    fi
+    for p in $scriptsdir/tinyos-${tinyos_main}_*.patch; do
         do_patch $builddir $p -p1
     done
     if is_osx; then
-        for p in $scriptsdir/${tinyos_main}-osx_*.patch; do
+        for p in $scriptsdir/tinyos-${tinyos_main}-osx_*.patch; do
             do_patch $builddir $p -p1
         done
     fi
@@ -64,7 +72,6 @@ function prepare() {
 }
 
 function build() {
-    tinyos::config
     do_cd $builddir/tools
     do_cmd ./Bootstrap \
         || die "bootstrap failed"
@@ -75,14 +82,22 @@ function build() {
 }
 
 function install() { 
-    tinyos::config
     do_cd $builddir/tools
     do_cmd sudo make -j$(num_cpus) install
-    tinyos::stow "$tinyos_src/$tinyos_main"
+    do_cd $buildtop
+    local tinyos_src=$prefix/sources
+    if [[ $tinyos_main == current ]]; then
+        :
+    else
+        copy --sudo tinyos-$tinyos_main.tar.gz $tinyos_src/tinyos-$tinyos_main
+    fi
+    local srcs=($tinyos_src/tinyos-$tinyos_main)
+    [[ -d $tinyos_src/tinyos-msp430-$tinyos_msp430 ]] \
+        && srcs+=($tinyos_src/tinyos-msp430-$tinyos_msp430)
+    do_cmd tinyos_stow --sudo $prefix/root $tinyos_src/stow "${srcs[@]}"
 }
 
 function cleanup() {
-    tinyos::config
     do_cmd rm -rf $builddir
 }
 
