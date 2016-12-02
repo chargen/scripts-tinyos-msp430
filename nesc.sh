@@ -35,7 +35,9 @@
 source $(dirname $0 )/main.subr
 
 function download() {
-    if [[ $nesc == nesc ]]; then
+    if [[ $nesc == system ]]; then
+        :
+    elif [[ $nesc == current ]]; then
         clone git $nesc_repo nesc-$nesc
     else
         local url=$nesc_url/v$nesc.tar.gz
@@ -45,7 +47,9 @@ function download() {
 }
 
 function prepare() {
-    if [[ $nesc == current ]]; then
+    if [[ $nesc == system ]]; then
+        return 0
+    elif [[ $nesc == current ]]; then
         copy nesc-$nesc $builddir
     else
         copy nesc-$nesc.tar.gz $builddir
@@ -64,6 +68,7 @@ function prepare() {
 }
 
 function build() {
+    [[ $nesc == system ]] && return 0
     do_cd $builddir
     do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
@@ -73,11 +78,13 @@ function build() {
 }
 
 function install() {
+    [[ $nesc == system ]] && return 0
     do_cd $builddir
     do_cmd sudo make install
 }
 
 function cleanup() { 
+    [[ $nesc == system ]] && return 0
     do_cmd rm -rf $builddir
 }
 

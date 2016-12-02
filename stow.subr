@@ -47,9 +47,9 @@ function tinyos_stow() {
     fi
     [[ -d $root_dir ]] || do_cmd "${mkdir[@]}" -p $root_dir
     [[ -d $stow_dir ]] || do_cmd "${mkdir[@]}" -p $stow_dir
+    do_cmd "${rm[@]} -rf $root_dir/*"
+    do_cmd "${rm[@]} -f $stow_dir/*"
     do_cd $stow_dir
-    do_cmd "${stow[@]}" -D -t $root_dir *
-    do_cmd "${rm[@]}" *
     local src_dir
     for src_dir in "$@"; do
         do_cmd "${rm[@]}" -f $(basename $src_dir)

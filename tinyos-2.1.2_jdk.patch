@@ -1,18 +1,5 @@
-diff -ur tinyos-2.1.2/tools/configure.ac{.~1~,}
---- tinyos-2.1.2/tools/configure.ac.~1~	2013-05-01 18:26:41.000000000 +0900
-+++ tinyos-2.1.2/tools/configure.ac	2014-03-01 13:19:31.000000000 +0900
-@@ -101,7 +101,7 @@
- if test $? -ne 0; then
-   AC_ERROR(java not found)
- fi
--JDK=`dirname "$JAVAC_DIR"`
-+JDK=`/bin/sh tinyos/misc/tos-locate-jre --jni`
- AC_MSG_RESULT($JDK)
- 
- function jnimap {
-diff -ur tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre{.~1~,}
---- tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre{.~1~,}	2013-05-01 18:26:40.000000000 +0900
-+++ tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre	2014-03-01 13:27:27.000000000 +0900
+--- tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre.~1~	2012-08-21 03:28:42.000000000 +0900
++++ tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre	2016-12-03 01:41:44.049111352 +0900
 @@ -67,11 +67,16 @@
  
      pn=`sw_vers -productName | sed 's/ //g'`
@@ -30,7 +17,7 @@ diff -ur tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre{.~1~,}
      ;;
  
      Linux)
-@@ -134,7 +139,11 @@
+@@ -134,9 +139,15 @@
      # Windows, and IBM Java: in jre/bin
      # Sun Java on Linux: in jre/lib/i386
      if [ `uname` = "Darwin" ]; then 
@@ -41,4 +28,8 @@ diff -ur tinyos-2.1.2/tools/tinyos/misc/tos-locate-jre{.~1~,}
 +	fi
      elif "$jhome/bin/java" -version 2>&1 | grep -q IBM || cygpath -w / >/dev/null 2>/dev/null; then
  	jnilocate "$jhome/jre/bin" || jnilocate "$jhome/bin"
++    elif "$jhome/bin/java" -version 2>&1 | grep -qi openjdk; then
++	jnilocate "$jhome/include"
      else
+ 	arch=`uname -m`
+ 	jnilocate "$jhome/jre/lib/$arch" || \

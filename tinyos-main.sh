@@ -37,10 +37,11 @@ source $(dirname $0)/main.subr
 function download() {
     local tinyos_src=$prefix/sources
     [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
-    if [[ $tinyos_main == current ]]; then
+    if [[ $tinyos_main =~ system ]]; then
+        :
+    elif [[ $tinyos_main == current ]]; then
         local dir=$tinyos_src/tinyos-$tinyos_main
         clone --sudo git $tinyos_main_repo $dir
-        do_cd $dir
     else
         local tag=release_tinyos_${tinyos_main//./_}
         local url=$tinyos_main_url/$tag.tar.gz
@@ -50,55 +51,31 @@ function download() {
 }
 
 function prepare() {
-    [[ $(which autoheader) =~ autoheader ]] \
-        || die "autoconf is not installed"
-    [[ $(which automake) =~ automake ]] \
-        || die "automake is not installed"
-    if [[ $tinyos_main == current ]]; then
-        copy $prefix/sources/tinyos-$tinyos_main $builddir
-    else
-        local tag=release_tinyos_${timyos_main//./_}
-        copy tinyos-$tinyos_main.tar.gz $builddir
-    fi
-    for p in $scriptsdir/tinyos-${tinyos_main}_*.patch; do
-        do_patch $builddir $p -p1
-    done
-    if is_osx; then
-        for p in $scriptsdir/tinyos-${tinyos_main}-osx_*.patch; do
-            do_patch $builddir $p -p1
-        done
-    fi
     return 0
 }
 
 function build() {
-    do_cd $builddir/tools
-    do_cmd ./Bootstrap \
-        || die "bootstrap failed"
-    do_cmd ./configure --prefix=$prefix --disable-nls \
-        || die "configure failed"
-    do_cmd make -j$(num_cpus) \
-        || die "make failed"
+    return 0
 }
 
 function install() { 
-    do_cd $builddir/tools
-    do_cmd sudo make -j$(num_cpus) install
-    do_cd $buildtop
     local tinyos_src=$prefix/sources
-    if [[ $tinyos_main == current ]]; then
-        :
+    local srcs=()
+    if [[ $tinyos_main =~ system: ]]; then
+        srcs=(${tinyos_main#system:})
+    elif [[ $tinyos_main == current ]]; then
+        srcs=($tinyos_src/tinyos-$tinyos_main)
     else
         copy --sudo tinyos-$tinyos_main.tar.gz $tinyos_src/tinyos-$tinyos_main
+        srcs=($tinyos_src/tinyos-$tinyos_main)
     fi
-    local srcs=($tinyos_src/tinyos-$tinyos_main)
     [[ -d $tinyos_src/tinyos-msp430-$tinyos_msp430 ]] \
         && srcs+=($tinyos_src/tinyos-msp430-$tinyos_msp430)
     do_cmd tinyos_stow --sudo $prefix/root $tinyos_src/stow "${srcs[@]}"
 }
 
 function cleanup() {
-    do_cmd rm -rf $builddir
+    return 0
 }
 
 main "$@"

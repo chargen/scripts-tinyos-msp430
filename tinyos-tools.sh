@@ -1,7 +1,7 @@
 #!/bin/bash -u
 # -*- mode: shell-script; mode: flyspell-prog; -*-
 #
-# Copyright (c) 2010, Tadashi G Takaoka
+# Copyright (c) 2016, Tadashi G Takaoka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,31 +34,57 @@
 
 source $(dirname $0)/main.subr
 
-PATH=$prefix/bin:$PATH
+function download() {
+    return 0
+}
 
-modules=(nesc tinyos-main tinyos-tools tinyos-msp430 scripts)
+function prepare() {
+    [[ $tinyos_tools == system ]] && return 0
+    [[ $(which autoheader) =~ autoheader ]] \
+        || die "autoconf is not installed"
+    [[ $(which automake) =~ automake ]] \
+        || die "automake is not installed"
+    if [[ $tinyos_main == current ]]; then
+        copy $prefix/sources/tinyos-$tinyos_main $builddir
+    else
+        local tag=release_tinyos_${tinyos_main//./_}
+        copy tinyos-$tinyos_main.tar.gz $builddir
+    fi
+    for p in $scriptsdir/tinyos-${tinyos_main}_*.patch; do
+        do_patch $builddir $p -p1
+    done
+    if is_osx; then
+        for p in $scriptsdir/tinyos-${tinyos_main}-osx_*.patch; do
+            do_patch $builddir $p -p1
+        done
+    fi
+    return 0
+}
 
-if [[ $# -eq 0 ]]; then
-    for module in "${modules[@]}"; do
-        $scriptsdir/$module.sh download
-    done
-    for module in "${modules[@]}"; do
-        $scriptsdir/$module.sh build install
-    done
-else
-    for cmd in "$@"; do
-        case $cmd in
-            download | build | install | clean | cleanup)
-                for module in "${modules[@]}"; do
-                    $scriptsdir/$module.sh $cmd
-                done
-                ;;
-            *)
-                die "unknown command $cmd"
-                ;;
-        esac
-    done
-fi
+function build() {
+    [[ $tinyos_tools == system ]] && return 0
+    do_cd $builddir/tools
+    do_cmd ./Bootstrap \
+        || die "bootstrap failed"
+    do_cmd ./configure --prefix=$prefix --disable-nls \
+        || die "configure failed"
+    do_cmd make -j$(num_cpus) \
+        || die "make failed"
+}
+
+function install() { 
+    [[ $tinyos_tools == system ]] && return 0
+    do_cd $builddir/tools
+    do_cmd sudo make -j$(num_cpus) install
+    do_cd $buildtop
+}
+
+function cleanup() {
+    [[ $tinyos_tools == system ]] && return 0
+    do_cmd rm -rf $builddir
+}
+
+main "$@"
 
 # Local Variables:
 # indent-tabs-mode: nil

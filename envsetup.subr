@@ -51,7 +51,7 @@ function tinyos_msp430::config() {
     fi
 
     local prefix buildtarget
-    local nesc tinyos_main tinyos_msp430
+    local nesc tinyos_main tinyos_tools tinyos_msp430
     local nesc_url nesc_repo
     local tinyos_main_url tinyos_main_repo
     local tinyos_msp430_url tinyos_msp430_repo
