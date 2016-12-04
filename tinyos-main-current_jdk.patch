@@ -1,18 +1,5 @@
-diff -ur tinyos-current/tools/configure.ac build-tinyos-main/tools/configure.ac
---- tinyos-current/tools/configure.ac	2015-05-26 15:42:57.000000000 +0900
-+++ build-tinyos-msp430-tinyos-main/tools/configure.ac	2015-05-26 15:43:00.000000000 +0900
-@@ -107,7 +107,7 @@
- if test $? -ne 0; then
-   AC_ERROR(java not found)
- fi
--JDK=`dirname "$JAVAC_DIR"`
-+JDK=`/bin/sh tinyos/misc/tos-locate-jre --jni`
- AC_MSG_RESULT($JDK)
- 
- AC_MSG_CHECKING(for location to put JARs)
-diff -ur tinyos-current/tools/tinyos/misc/tos-locate-jre build-tinyos-main/tools/tinyos/misc/tos-locate-jre
---- tinyos-current/tools/tinyos/misc/tos-locate-jre	2015-05-26 15:42:57.000000000 +0900
-+++ build-tinyos-main/tools/tinyos/misc/tos-locate-jre	2015-05-26 15:52:42.000000000 +0900
+--- tinyos-main-current/tools/tinyos/misc/tos-locate-jre	2016-12-03 18:30:17.124417619 +0900
++++ build-tinyos-msp430-tinyos-tools/tools/tinyos/misc/tos-locate-jre	2016-12-04 19:14:30.282697016 +0900
 @@ -72,11 +72,16 @@
  
      pn=`sw_vers -productName | sed 's/ //g'`
@@ -24,21 +11,25 @@ diff -ur tinyos-current/tools/tinyos/misc/tos-locate-jre build-tinyos-main/tools
      xcode_jdk=/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers
      jhome=/Library/Java/Home
 +    else
-+    jhome=/System/Library/Frameworks/JavaVM.framework/Versions/Current
-+    xcode_jdk=$jhome/Commands
++    jhome=$(/usr/libexec/java_home)
++    xcode_jdk=$jhome/bin
 +    fi
      ;;
  
      Linux)
-@@ -139,7 +144,11 @@
+@@ -139,9 +144,15 @@
      # Windows, and IBM Java: in jre/bin
      # Sun Java on Linux: in jre/lib/i386
      if [ `uname` = "Darwin" ]; then
 +	if [[ $pv = 10.6 ]]; then #Snow Leopard
  	jnilocate "/Library/Java/Extensions"
-+        else
-+	jnilocate $jhome
++	else
++	jnilocate "$jhome/include"
 +	fi
      elif "$jhome/bin/java" -version 2>&1 | grep -q IBM || cygpath -w / >/dev/null 2>/dev/null; then
  	jnilocate "$jhome/jre/bin" || jnilocate "$jhome/bin"
++    elif "$jhome/bin/java" -version 2>&1 | grep -qi openjdk; then
++	jnilocate "$jhome/include"
      else
+ 	arch=`uname -m`
+ 	jnilocate "$jhome/jre/lib/$arch" || \

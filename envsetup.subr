@@ -62,15 +62,11 @@ function tinyos_msp430::config() {
         return
     fi
 
-    TOSROOT=$prefix/root
-    TOSDIR=$TOSROOT/tos
-    MAKERULES=$TOSROOT/support/make/Makerules
-    CLASSPATH=$(add_path $CLASSPATH $TOSROOT/support/sdk/java/tinyos.jar)
+    TINYOS_ROOT_DIR=$prefix/root/tinyos-main
+    TINYOS_ROOT_DIR_ADDITIONAL=$prefix/root/tinyos-msp430
 
-    export TOSROOT
-    export TOSDIR
-    export CLASSPATH
-    export MAKERULES
+    export TINYOS_ROOT_DIR
+    export TINYOS_ROOT_DIR_ADDITIONAL
 
     PATH=$(add_path $PATH $prefix/sbin $prefix/bin)
     MANPATH=$(add_path $MANPATH $prefix/man)

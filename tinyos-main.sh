@@ -40,7 +40,7 @@ function download() {
     if [[ $tinyos_main =~ system ]]; then
         :
     elif [[ $tinyos_main == current ]]; then
-        local dir=$tinyos_src/tinyos-$tinyos_main
+        local dir=$tinyos_src/tinyos-main-$tinyos_main
         clone --sudo git $tinyos_main_repo $dir
     else
         local tag=release_tinyos_${tinyos_main//./_}
@@ -60,18 +60,15 @@ function build() {
 
 function install() { 
     local tinyos_src=$prefix/sources
-    local srcs=()
+    local dst=$prefix/root/tinyos-main
     if [[ $tinyos_main =~ system: ]]; then
-        srcs=(${tinyos_main#system:})
+        symlink --sudo ${tinyos_main#system:} $dst
     elif [[ $tinyos_main == current ]]; then
-        srcs=($tinyos_src/tinyos-$tinyos_main)
+        symlink --sudo $tinyos_src/tinyos-main-$tinyos_main $dst
     else
         copy --sudo tinyos-$tinyos_main.tar.gz $tinyos_src/tinyos-$tinyos_main
-        srcs=($tinyos_src/tinyos-$tinyos_main)
+        symlink --sudo $tinyos_src/tinyos-$tinyos_main $dst
     fi
-    [[ -d $tinyos_src/tinyos-msp430-$tinyos_msp430 ]] \
-        && srcs+=($tinyos_src/tinyos-msp430-$tinyos_msp430)
-    do_cmd tinyos_stow --sudo $prefix/root $tinyos_src/stow "${srcs[@]}"
 }
 
 function cleanup() {

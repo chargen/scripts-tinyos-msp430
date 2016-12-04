@@ -35,26 +35,27 @@
 source $(dirname $0)/main.subr
 
 function download() {
+    [[ $tinyos_tools == build ]] || die "tinyos_tools must be built"
     return 0
 }
 
 function prepare() {
-    [[ $tinyos_tools == system ]] && return 0
+    [[ $tinyos_tools == build ]] || die "tinyos_tools must be built"
+    [[ $tinyos_main == current ]] || die "tinyos_main must be current"
     [[ $(which autoheader) =~ autoheader ]] \
         || die "autoconf is not installed"
     [[ $(which automake) =~ automake ]] \
         || die "automake is not installed"
+    local src_name=tinyos-$tinyos_main
     if [[ $tinyos_main == current ]]; then
-        copy $prefix/sources/tinyos-$tinyos_main $builddir
-    else
-        local tag=release_tinyos_${tinyos_main//./_}
-        copy tinyos-$tinyos_main.tar.gz $builddir
+        src_name=tinyos-main-current
+        copy $prefix/sources/$src_name $builddir
     fi
-    for p in $scriptsdir/tinyos-${tinyos_main}_*.patch; do
+    for p in $scriptsdir/${src_name}_*.patch; do
         do_patch $builddir $p -p1
     done
     if is_osx; then
-        for p in $scriptsdir/tinyos-${tinyos_main}-osx_*.patch; do
+        for p in $scriptsdir/${src_name}-osx_*.patch; do
             do_patch $builddir $p -p1
         done
     fi
@@ -62,7 +63,7 @@ function prepare() {
 }
 
 function build() {
-    [[ $tinyos_tools == system ]] && return 0
+    [[ $tinyos_tools == build ]] || die "tinyos_tools can't be system"
     do_cd $builddir/tools
     do_cmd ./Bootstrap \
         || die "bootstrap failed"
@@ -73,14 +74,14 @@ function build() {
 }
 
 function install() { 
-    [[ $tinyos_tools == system ]] && return 0
+    [[ $tinyos_tools == build ]] || die "tinyos_tools must be built"
     do_cd $builddir/tools
     do_cmd sudo make -j$(num_cpus) install
     do_cd $buildtop
 }
 
 function cleanup() {
-    [[ $tinyos_tools == system ]] && return 0
+    [[ $tinyos_tools == build ]] || die "tinyos_tools must be built"
     do_cmd rm -rf $builddir
 }
 

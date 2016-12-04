@@ -77,12 +77,16 @@ function num_cpus() {
 }
 
 function symlink() {
+    local -a sudo=()
+    [[ $1 == "--sudo" ]] && { sudo+=(sudo); shift; }
     [[ $# -eq 2 ]] \
-        || die "usage: symlink src dst"
+        || die "usage: symlink [--sudo] src dst"
     local src=$1 dst=$2
+    [[ -d $(dirname $dst) ]] \
+        || do_cmd "${sudo[@]}" mkdir -p $(dirname $dst)
     [[ -d $dst || -h $dst ]] \
-        && do_cmd rm -rf $dst
-    do_cmd ln -s $src $dst
+        && do_cmd "${sudo[@]}" rm -rf $dst
+    do_cmd "${sudo[@]}" ln -s $src $dst
 }
 
 function fetch() {

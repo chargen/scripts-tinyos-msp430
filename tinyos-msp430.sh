@@ -56,13 +56,13 @@ function build() {
 
 function install() {
     local tinyos_src=$prefix/sources
+    local dst=$prefix/root/tinyos-msp430
     if [[ $tinyos_msp430 == current ]]; then
         :
     else
         copy --sudo tinyos-msp430-$tinyos_msp430.tar.gz $tinyos_src/tinyos-msp430-$tinyos_msp430
     fi
-    local srcs=($tinyos_src/tinyos-$tinyos_main $tinyos_src/tinyos-msp430-$tinyos_msp430)
-    do_cmd tinyos_stow --sudo $prefix/root $tinyos_src/stow "${srcs[@]}"
+    symlink --sudo $tinyos_src/tinyos-msp430-$tinyos_msp430 $dst
 }
 
 function cleanup() {
