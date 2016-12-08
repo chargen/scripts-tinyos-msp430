@@ -11,8 +11,8 @@
      xcode_jdk=/Developer/SDKs/${pn}${pv}.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
      jhome=/Library/Java/Home
 +    else
-+    jhome=/System/Library/Frameworks/JavaVM.framework/Versions/Current
-+    xcode_jdk=$jhome/Commands
++    jhome=$(/usr/libexec/java_home)
++    xcode_jdk=$jhome/bin
 +    fi
      ;;
  
@@ -24,7 +24,7 @@
 +	if [[ $pv = 10.6 ]]; then # Snow Leopard
  	jnilocate "/Library/Java/Extensions"
 +	else
-+	jnilocate $jhome
++	jnilocate "$jhome/include"
 +	fi
      elif "$jhome/bin/java" -version 2>&1 | grep -q IBM || cygpath -w / >/dev/null 2>/dev/null; then
  	jnilocate "$jhome/jre/bin" || jnilocate "$jhome/bin"

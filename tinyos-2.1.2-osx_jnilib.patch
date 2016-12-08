@@ -1,0 +1,37 @@
+--- build-tinyos-msp430-tinyos-tools/tools/tinyos/java/env/Makefile.am.~1~	2012-08-21 03:28:42.000000000 +0900
++++ build-tinyos-msp430-tinyos-tools/tools/tinyos/java/env/Makefile.am	2016-12-08 15:27:20.000000000 +0900
+@@ -9,6 +9,7 @@
+ EXTRA_PROGRAMS = libgetenv-32.so libgetenv-64.so getenv.dll libgetenv.jnilib
+ 
+ SOFLAGS = "-I$(JDK)/include/linux" "-I$(JDK)/include" -shared -fpic
++JNILIB_FLAGS = "-I$(JDK)/include/darwin" "-I$(JDK)/include" -bundle -fPIC
+ 
+ libgetenv_32_so_SOURCES = net_tinyos_util_Env.h net_tinyos_util_Env.c
+ libgetenv_64_so_SOURCES = $(libgetenv_32_so_SOURCES)
+@@ -26,5 +27,5 @@
+ 	gcc -shared -o$@ -mno-cygwin "-I$(JDK)/include" "-I$(JDK)/include/win32" -D_JNI_IMPLEMENTATION -Wl,--kill-at net_tinyos_util_Env.c
+ 
+ libgetenv.jnilib : net_tinyos_util_Env.h net_tinyos_util_Env.c
+-	gcc "-I$(JDK)/Headers" -bundle -fPIC net_tinyos_util_Env.c -o $@
++	gcc $(JNILIB_FLAGS) net_tinyos_util_Env.c -o $@
+ 
+--- build-tinyos-msp430-tinyos-tools/tools/tinyos/java/serial/Makefile.am.~1~	2012-08-21 03:28:42.000000000 +0900
++++ build-tinyos-msp430-tinyos-tools/tools/tinyos/java/serial/Makefile.am	2016-12-08 15:34:56.000000000 +0900
+@@ -11,6 +11,7 @@
+ # Compiling libtoscomm.so with -O2 generates bad code with gcc 4.1.x on x86_64
+ # (the -O1 code is slightly weird, but works at least ;-))
+ SOFLAGS = -O1 -shared -fPIC "-I$(JDK)/include" "-I$(JDK)/include/linux"
++JNILIB_FLAGS = -O2 -bundle "-I$(JDK)/include/darwin" "-I$(JDK)/include"
+ 
+ libtoscomm_32_so_SOURCES = \
+   NativeSerialEnums.h \
+@@ -30,8 +31,7 @@
+   TOSComm_wrap.cxx
+ 
+ libtoscomm.jnilib:  $(libtoscomm_jnilib_SOURCES)
+-	$(CXX) -O2 -bundle "-I$(JDK)/Headers" \
+-	 -o $@ NativeSerial_darwin.cpp
++	$(CXX) $(JNILIB_FLAGS) -o $@ NativeSerial_darwin.cpp
+ 
+ libtoscomm-32.so: $(libtoscomm_so_SOURCES)
+ 	$(CXX) -m32 $(SOFLAGS) -o $@ NativeSerial_linux.cpp || \
