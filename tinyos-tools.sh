@@ -69,7 +69,7 @@ function build() {
         || die "bootstrap failed"
     do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
-    do_cmd make -j$(num_cpus) \
+    do_cmd make \
         || die "make failed"
 }
 
